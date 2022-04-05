@@ -1,0 +1,46 @@
+{
+  "name": "pomodoro",
+  "version": "1.0.0",
+  "description": "pomodoro app built with react native (expo)",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject"
+  },
+  "dependencies": {
+    "@expo-google-fonts/raleway": "^0.2.2",
+    "@reduxjs/toolkit": "^1.8.1",
+    "@types/react-redux": "^7.1.23",
+    "expo": "~44.0.0",
+    "expo-app-loading": "~1.3.0",
+    "expo-font": "~10.0.4",
+    "expo-status-bar": "~1.2.0",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-native": "0.64.3",
+    "react-native-safe-area-context": "3.3.2",
+    "react-native-web": "0.17.1",
+    "react-redux": "^7.2.8",
+    "twrnc": "^3.0.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@types/react": "~17.0.21",
+    "@types/react-native": "~0.64.12",
+    "typescript": "~4.3.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juxnpxblo/pomodoro.git"
+  },
+  "keywords": [],
+  "author": "juxnpxblo",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/juxnpxblo/pomodoro/issues"
+  },
+  "homepage": "https://github.com/juxnpxblo/pomodoro#readme"
+}
