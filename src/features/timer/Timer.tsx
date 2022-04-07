@@ -1,17 +1,28 @@
-import tw from '../lib/tailwind';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { View, Text, Pressable } from 'react-native';
+import tw from '../../lib/tailwind';
 import AppLoading from 'expo-app-loading';
-import { View, Text } from 'react-native';
-import Icon from '@expo/vector-icons/MaterialIcons';
 import { useFonts } from 'expo-font';
 import {
   Raleway_400Regular,
   Raleway_600SemiBold,
+  Raleway_700Bold,
 } from '@expo-google-fonts/raleway';
+import Icon from '@expo/vector-icons/MaterialIcons';
+import BaseLayout from '../../common/components/BaseLayout';
 
-const Timer = () => {
+type RootStackParamList = {
+  Timer: undefined;
+  Settings: undefined;
+};
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Timer'>;
+
+const Timer = ({ navigation }: Props) => {
   let [fontsLoaded] = useFonts({
     Raleway_400Regular,
     Raleway_600SemiBold,
+    Raleway_700Bold,
   });
 
   if (!fontsLoaded) {
@@ -19,10 +30,12 @@ const Timer = () => {
   }
 
   return (
-    <View style={tw`h-full pt-3`}>
+    <BaseLayout>
       <View style={tw`flex-row justify-between`}>
         <Icon name="help" size={26} color="white" />
-        <Icon name="settings" size={26} color="white" />
+        <Pressable onPress={() => navigation.navigate('Settings')}>
+          <Icon name="settings" size={26} color="white" />
+        </Pressable>
       </View>
       <View style={tw`h-full justify-center`}>
         <View style={tw`mb-4`}>
@@ -53,7 +66,7 @@ const Timer = () => {
                   </View>
                   <Text
                     style={tw.style('text-8xl text-white', {
-                      fontFamily: 'Raleway_600SemiBold',
+                      fontFamily: 'Raleway_700Bold',
                     })}
                   >
                     23:12
@@ -101,7 +114,7 @@ const Timer = () => {
           <Icon name="pause-circle-filled" size={95} color="white" />
         </View>
       </View>
-    </View>
+    </BaseLayout>
   );
 };
 
