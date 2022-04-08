@@ -3,9 +3,6 @@ import { store } from './src/app/store';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { View } from 'react-native';
-import tw from './src/lib/tailwind';
 import Timer from './src/features/timer/Timer';
 import Settings from './src/features/settings/Settings';
 
