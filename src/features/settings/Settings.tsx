@@ -1,3 +1,14 @@
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import {
+  changedFocusTime,
+  changedShortBreakTime,
+  changedLongBreakTime,
+  changedTotalIntervals,
+  selectFocusTime,
+  selectShortBreakTime,
+  selectLongBreakTime,
+  selectTotalIntervals,
+} from './settingsSlice';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { View, Text, Pressable } from 'react-native';
 import tw from '../../lib/tailwind';
@@ -19,6 +30,13 @@ type RootStackParamList = {
 type Props = NativeStackScreenProps<RootStackParamList, 'Timer'>;
 
 const Timer = ({ navigation }: Props) => {
+  const dispatch = useAppDispatch();
+
+  const focusTime = useAppSelector(selectFocusTime);
+  const shortBreakTime = useAppSelector(selectShortBreakTime);
+  const longBreakTime = useAppSelector(selectLongBreakTime);
+  const totalIntervals = useAppSelector(selectTotalIntervals);
+
   let [fontsLoaded] = useFonts({
     Raleway_400Regular,
     Raleway_600SemiBold,
@@ -43,10 +61,10 @@ const Timer = ({ navigation }: Props) => {
         >
           Settings
         </Text>
-        <Option name="Focus time" currentValue="25 min" />
-        <Option name="Short break" currentValue="5 min" />
-        <Option name="Long Break" currentValue="15 min" />
-        <Option name="Sections" currentValue="4 intervals" />
+        <Option name="Focus time" currentValue={`${focusTime} min`} />
+        <Option name="Short break" currentValue={`${shortBreakTime} min`} />
+        <Option name="Long Break" currentValue={`${longBreakTime} min`} />
+        <Option name="Sections" currentValue={`${totalIntervals} intervals`} />
         <View
           style={tw`flex-row absolute bottom-10 rounded-full self-center bg-red-3 py-3 px-10`}
         >

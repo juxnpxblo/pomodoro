@@ -15,8 +15,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    // <Provider store={store}>
-    <>
+    <Provider store={store}>
       <StatusBar style="light" />
       <NavigationContainer>
         <Stack.Navigator>
@@ -32,7 +31,6 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </>
-    // </Provider>
+    </Provider>
   );
 }

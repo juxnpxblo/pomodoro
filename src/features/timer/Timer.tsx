@@ -1,3 +1,15 @@
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import {
+  set,
+  played,
+  paused,
+  changedInterval,
+  selectStatus,
+  selectTimestamp,
+  selectCurrentSection,
+  selectCurrentRound,
+  selectPausedOn,
+} from './timerSlice';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { View, Text, Pressable } from 'react-native';
 import tw from '../../lib/tailwind';
@@ -19,6 +31,14 @@ type RootStackParamList = {
 type Props = NativeStackScreenProps<RootStackParamList, 'Timer'>;
 
 const Timer = ({ navigation }: Props) => {
+  const dispatch = useAppDispatch();
+
+  const status = useAppSelector(selectStatus);
+  const timestamp = useAppSelector(selectTimestamp);
+  const currentSection = useAppSelector(selectCurrentSection);
+  const currentRound = useAppSelector(selectCurrentRound);
+  const pausedOn = useAppSelector(selectPausedOn);
+
   let [fontsLoaded] = useFonts({
     Raleway_400Regular,
     Raleway_600SemiBold,
