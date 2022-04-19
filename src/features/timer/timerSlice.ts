@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
+import { getRemainingTime, timeToString } from '../../common/helpers/timer';
 
 export type Sections = 'focus' | 'short break' | 'long break';
 
@@ -14,9 +15,9 @@ export interface timerState {
   currentSection: Sections;
   timestamp: number;
   currentRound: number;
-  pausedOn: {
-    minutes: number;
-    seconds: number;
+  remainingTime: {
+    minutes: string;
+    seconds: string;
   };
 }
 
@@ -25,9 +26,9 @@ const initialState: timerState = {
   timestamp: 0,
   currentSection: 'focus',
   currentRound: 1,
-  pausedOn: {
-    minutes: 0,
-    seconds: 0,
+  remainingTime: {
+    minutes: '00',
+    seconds: '00',
   },
 };
 
@@ -39,17 +40,28 @@ export const timerSlice = createSlice({
       state.currentSection = action.payload.section;
       state.status = 'paused';
 
-      state.pausedOn.minutes = action.payload.minutes;
-      state.pausedOn.seconds = action.payload.seconds || 0;
+      state.remainingTime.minutes = timeToString(action.payload.minutes);
+      state.remainingTime.seconds = timeToString(action.payload.seconds || 0);
+    },
+    passedOneSec: (state) => {
+      const remainingTime = getRemainingTime(state.timestamp);
+
+      state.remainingTime.minutes = remainingTime.minutes;
+      state.remainingTime.seconds = remainingTime.seconds;
     },
     played: (state) => {
-      // ver onde esta pausado
-      // setar state.timestamp pra ser qtd q ta pausado pro futuro
+      const timestamp = new Date();
+      timestamp.setMinutes(
+        timestamp.getMinutes() + +state.remainingTime.minutes
+      );
+      timestamp.setSeconds(
+        timestamp.getSeconds() + +state.remainingTime.seconds
+      );
+
+      state.timestamp = +timestamp;
       state.status = 'ticking';
     },
     paused: (state) => {
-      // calcular diferenca de agora pro timestamp, min e sec
-      // setar pausedOn nesses min e sec
       state.status = 'paused';
     },
     changedInterval: (state, action: PayloadAction<number>) => {
@@ -58,7 +70,8 @@ export const timerSlice = createSlice({
   },
 });
 
-export const { set, played, paused, changedInterval } = timerSlice.actions;
+export const { set, passedOneSec, played, paused, changedInterval } =
+  timerSlice.actions;
 
 export const selectStatus = ({ timer: { status } }: RootState) => status;
 export const selectTimestamp = ({ timer: { timestamp } }: RootState) =>
@@ -68,6 +81,7 @@ export const selectCurrentSection = ({
 }: RootState) => currentSection;
 export const selectCurrentRound = ({ timer: { currentRound } }: RootState) =>
   currentRound;
-export const selectPausedOn = ({ timer: { pausedOn } }: RootState) => pausedOn;
+export const selectRemainingTime = ({ timer: { remainingTime } }: RootState) =>
+  remainingTime;
 
 export default timerSlice.reducer;

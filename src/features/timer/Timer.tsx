@@ -1,14 +1,15 @@
+import { useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import {
   set,
+  passedOneSec,
   played,
   paused,
   changedInterval,
   selectStatus,
-  selectTimestamp,
   selectCurrentSection,
   selectCurrentRound,
-  selectPausedOn,
+  selectRemainingTime,
 } from './timerSlice';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { View, Text, Pressable } from 'react-native';
@@ -34,10 +35,15 @@ const Timer = ({ navigation }: Props) => {
   const dispatch = useAppDispatch();
 
   const status = useAppSelector(selectStatus);
-  const timestamp = useAppSelector(selectTimestamp);
   const currentSection = useAppSelector(selectCurrentSection);
   const currentRound = useAppSelector(selectCurrentRound);
-  const pausedOn = useAppSelector(selectPausedOn);
+  const remainingTime = useAppSelector(selectRemainingTime);
+
+  const tickingId = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    dispatch(set({ section: 'focus', minutes: 25 }));
+  }, []);
 
   let [fontsLoaded] = useFonts({
     Raleway_400Regular,
@@ -81,7 +87,10 @@ const Timer = ({ navigation }: Props) => {
                         fontFamily: 'Raleway_400Regular',
                       })}
                     >
-                      Time to focus! #1
+                      {currentSection === 'focus'
+                        ? 'Time to focus!'
+                        : 'Time for a break!'}{' '}
+                      #{currentRound}
                     </Text>
                   </View>
                   <Text
@@ -89,7 +98,9 @@ const Timer = ({ navigation }: Props) => {
                       fontFamily: 'Raleway_700Bold',
                     })}
                   >
-                    23:12
+                    {status !== 'unset'
+                      ? `${remainingTime.minutes}:${remainingTime.seconds}`
+                      : `00:00`}
                   </Text>
                 </View>
                 <Icon
@@ -130,8 +141,27 @@ const Timer = ({ navigation }: Props) => {
               style={tw`w-[35px] h-[35px] bg-white rounded-full mr-3`}
             ></View>
           </View>
-          {/* <Icon name="play-circle-filled" size={95} color="white" /> */}
-          <Icon name="pause-circle-filled" size={95} color="white" />
+          {status === 'ticking' ? (
+            <Pressable
+              onPress={() => {
+                dispatch(paused());
+                clearInterval(tickingId.current!);
+              }}
+            >
+              <Icon name="pause-circle-filled" size={95} color="white" />
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={() => {
+                dispatch(played());
+                tickingId.current = setInterval(() => {
+                  dispatch(passedOneSec());
+                }, 1000);
+              }}
+            >
+              <Icon name="play-circle-filled" size={95} color="white" />
+            </Pressable>
+          )}
         </View>
       </View>
     </BaseLayout>
