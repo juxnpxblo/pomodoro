@@ -5,14 +5,14 @@ export interface SettingsState {
   focusTime: number;
   shortBreakTime: number;
   longBreakTime: number;
-  totalIntervals: number;
+  totalRounds: number;
 }
 
 const initialState: SettingsState = {
-  focusTime: 25,
+  focusTime: 1,
   shortBreakTime: 5,
   longBreakTime: 15,
-  totalIntervals: 4,
+  totalRounds: 4,
 };
 
 export const settingsSlice = createSlice({
@@ -28,8 +28,8 @@ export const settingsSlice = createSlice({
     changedLongBreakTime: (state, action: PayloadAction<number>) => {
       state.longBreakTime = action.payload;
     },
-    changedTotalIntervals: (state, action: PayloadAction<number>) => {
-      state.totalIntervals = action.payload;
+    changedTotalRounds: (state, action: PayloadAction<number>) => {
+      state.totalRounds = action.payload;
     },
   },
 });
@@ -38,7 +38,7 @@ export const {
   changedFocusTime,
   changedShortBreakTime,
   changedLongBreakTime,
-  changedTotalIntervals,
+  changedTotalRounds,
 } = settingsSlice.actions;
 
 export const selectFocusTime = ({ settings: { focusTime } }: RootState) =>
@@ -49,8 +49,7 @@ export const selectShortBreakTime = ({
 export const selectLongBreakTime = ({
   settings: { longBreakTime },
 }: RootState) => longBreakTime;
-export const selectTotalIntervals = ({
-  settings: { totalIntervals },
-}: RootState) => totalIntervals;
+export const selectTotalRounds = ({ settings: { totalRounds } }: RootState) =>
+  totalRounds;
 
 export default settingsSlice.reducer;

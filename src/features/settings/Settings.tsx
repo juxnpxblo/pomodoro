@@ -3,11 +3,11 @@ import {
   changedFocusTime,
   changedShortBreakTime,
   changedLongBreakTime,
-  changedTotalIntervals,
+  changedTotalRounds,
   selectFocusTime,
   selectShortBreakTime,
   selectLongBreakTime,
-  selectTotalIntervals,
+  selectTotalRounds,
 } from './settingsSlice';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { View, Text, Pressable } from 'react-native';
@@ -35,7 +35,7 @@ const Timer = ({ navigation }: Props) => {
   const focusTime = useAppSelector(selectFocusTime);
   const shortBreakTime = useAppSelector(selectShortBreakTime);
   const longBreakTime = useAppSelector(selectLongBreakTime);
-  const totalIntervals = useAppSelector(selectTotalIntervals);
+  const totalRounds = useAppSelector(selectTotalRounds);
 
   let [fontsLoaded] = useFonts({
     Raleway_400Regular,
@@ -64,7 +64,7 @@ const Timer = ({ navigation }: Props) => {
         <Option name="Focus time" currentValue={`${focusTime} min`} />
         <Option name="Short break" currentValue={`${shortBreakTime} min`} />
         <Option name="Long Break" currentValue={`${longBreakTime} min`} />
-        <Option name="Sections" currentValue={`${totalIntervals} intervals`} />
+        <Option name="Sections" currentValue={`${totalRounds} intervals`} />
         <View
           style={tw`flex-row absolute bottom-10 rounded-full self-center bg-red-3 py-3 px-10`}
         >

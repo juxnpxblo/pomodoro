@@ -1,6 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import { getRemainingTime, timeToString } from '../../common/helpers/timer';
+import {
+  getRemainingTime,
+  timeToString,
+} from '../../common/helpers/timer.helper';
 
 export type Sections = 'focus' | 'short break' | 'long break';
 
@@ -25,7 +28,7 @@ const initialState: timerState = {
   status: 'unset',
   timestamp: 0,
   currentSection: 'focus',
-  currentRound: 1,
+  currentRound: 0,
   remainingTime: {
     minutes: '00',
     seconds: '00',
@@ -64,13 +67,13 @@ export const timerSlice = createSlice({
     paused: (state) => {
       state.status = 'paused';
     },
-    changedInterval: (state, action: PayloadAction<number>) => {
+    changedRound: (state, action: PayloadAction<number>) => {
       state.currentRound = action.payload;
     },
   },
 });
 
-export const { set, passedOneSec, played, paused, changedInterval } =
+export const { set, passedOneSec, played, paused, changedRound } =
   timerSlice.actions;
 
 export const selectStatus = ({ timer: { status } }: RootState) => status;

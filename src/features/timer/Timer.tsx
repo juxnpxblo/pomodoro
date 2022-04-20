@@ -5,12 +5,18 @@ import {
   passedOneSec,
   played,
   paused,
-  changedInterval,
+  changedRound,
   selectStatus,
   selectCurrentSection,
   selectCurrentRound,
   selectRemainingTime,
 } from './timerSlice';
+import {
+  selectFocusTime,
+  selectShortBreakTime,
+  selectLongBreakTime,
+  selectTotalRounds,
+} from '../settings/settingsSlice';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { View, Text, Pressable } from 'react-native';
 import tw from '../../lib/tailwind';
@@ -34,6 +40,11 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Timer'>;
 const Timer = ({ navigation }: Props) => {
   const dispatch = useAppDispatch();
 
+  const focusTime = useAppSelector(selectFocusTime);
+  const shortBreakTime = useAppSelector(selectShortBreakTime);
+  const longBreakTime = useAppSelector(selectLongBreakTime);
+  const totalRounds = useAppSelector(selectTotalRounds);
+
   const status = useAppSelector(selectStatus);
   const currentSection = useAppSelector(selectCurrentSection);
   const currentRound = useAppSelector(selectCurrentRound);
@@ -41,8 +52,65 @@ const Timer = ({ navigation }: Props) => {
 
   const tickingId = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const goToNextSection = () => {
+    if (currentSection === 'focus') {
+      if (currentRound < totalRounds) {
+        dispatch(set({ section: 'short break', minutes: shortBreakTime }));
+      } else {
+        dispatch(set({ section: 'long break', minutes: longBreakTime }));
+      }
+    } else {
+      dispatch(set({ section: 'focus', minutes: focusTime }));
+
+      if (currentRound === totalRounds) {
+        dispatch(changedRound(1));
+      } else {
+        dispatch(changedRound(currentRound + 1));
+      }
+    }
+  };
+
+  const goToPreviousSection = () => {
+    clearInterval(tickingId.current!);
+
+    if (currentSection === 'focus') {
+      if (+remainingTime.minutes === focusTime) {
+        if (currentRound !== 1) {
+          dispatch(changedRound(currentRound - 1));
+          dispatch(set({ section: 'short break', minutes: shortBreakTime }));
+        }
+      } else {
+        dispatch(set({ section: 'focus', minutes: focusTime }));
+      }
+    } else if (currentSection === 'short break') {
+      if (+remainingTime.minutes === shortBreakTime) {
+        dispatch(set({ section: 'focus', minutes: focusTime }));
+      } else {
+        dispatch(set({ section: 'short break', minutes: shortBreakTime }));
+      }
+    } else if (currentSection === 'long break') {
+      if (+remainingTime.minutes === longBreakTime) {
+        dispatch(set({ section: 'focus', minutes: focusTime }));
+      } else {
+        dispatch(set({ section: 'long break', minutes: longBreakTime }));
+      }
+    }
+  };
+
+  const reset = () => {
+    dispatch(set({ section: 'focus', minutes: focusTime }));
+    dispatch(changedRound(1));
+  };
+
   useEffect(() => {
-    dispatch(set({ section: 'focus', minutes: 25 }));
+    if (remainingTime.minutes === '00' && remainingTime.seconds === '00') {
+      clearInterval(tickingId.current!);
+      goToNextSection();
+    }
+  }, [remainingTime]);
+
+  useEffect(() => {
+    reset();
   }, []);
 
   let [fontsLoaded] = useFonts({
@@ -115,12 +183,15 @@ const Timer = ({ navigation }: Props) => {
                 color="white"
                 style={tw`absolute right-0 top-0`}
               /> */}
-                <Icon
-                  name="refresh"
-                  size={26}
-                  color="white"
+                <Pressable
                   style={tw`absolute right-0 bottom-0`}
-                />
+                  onPress={() => {
+                    clearInterval(tickingId.current!);
+                    reset();
+                  }}
+                >
+                  <Icon name="refresh" size={26} color="white" />
+                </Pressable>
               </View>
             </View>
           </View>
@@ -141,27 +212,50 @@ const Timer = ({ navigation }: Props) => {
               style={tw`w-[35px] h-[35px] bg-white rounded-full mr-3`}
             ></View>
           </View>
-          {status === 'ticking' ? (
+          <View style={tw`flex-row items-center`}>
             <Pressable
               onPress={() => {
-                dispatch(paused());
                 clearInterval(tickingId.current!);
+                goToPreviousSection();
               }}
             >
-              <Icon name="pause-circle-filled" size={95} color="white" />
+              <Icon
+                name="skip-previous"
+                size={48}
+                color="white"
+                style={tw`mr-2`}
+              />
             </Pressable>
-          ) : (
+            {status === 'ticking' ? (
+              <Pressable
+                onPress={() => {
+                  dispatch(paused());
+                  clearInterval(tickingId.current!);
+                }}
+              >
+                <Icon name="pause-circle-filled" size={96} color="white" />
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={() => {
+                  dispatch(played());
+                  tickingId.current = setInterval(() => {
+                    dispatch(passedOneSec());
+                  }, 1000);
+                }}
+              >
+                <Icon name="play-circle-filled" size={96} color="white" />
+              </Pressable>
+            )}
             <Pressable
               onPress={() => {
-                dispatch(played());
-                tickingId.current = setInterval(() => {
-                  dispatch(passedOneSec());
-                }, 1000);
+                clearInterval(tickingId.current!);
+                goToNextSection();
               }}
             >
-              <Icon name="play-circle-filled" size={95} color="white" />
+              <Icon name="skip-next" size={48} color="white" style={tw`ml-2`} />
             </Pressable>
-          )}
+          </View>
         </View>
       </View>
     </BaseLayout>
