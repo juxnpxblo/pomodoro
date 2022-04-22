@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import {
   changedFocusTime,
@@ -20,7 +21,10 @@ import {
 } from '@expo-google-fonts/raleway';
 import Icon from '@expo/vector-icons/MaterialIcons';
 import BaseLayout from '../../common/components/BaseLayout';
+// @ts-ignore
 import Option from '../../common/components/Option';
+
+import { OPTIONS, DEFAULT } from './settings.constants';
 
 type RootStackParamList = {
   Timer: undefined;
@@ -29,7 +33,9 @@ type RootStackParamList = {
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Timer'>;
 
-const Timer = ({ navigation }: Props) => {
+const Settings = ({ navigation }: Props) => {
+  const [openOption, setOpenOption] = useState('');
+
   const dispatch = useAppDispatch();
 
   const focusTime = useAppSelector(selectFocusTime);
@@ -61,11 +67,46 @@ const Timer = ({ navigation }: Props) => {
         >
           Settings
         </Text>
-        <Option name="Focus time" currentValue={`${focusTime} min`} />
-        <Option name="Short break" currentValue={`${shortBreakTime} min`} />
-        <Option name="Long Break" currentValue={`${longBreakTime} min`} />
-        <Option name="Sections" currentValue={`${totalRounds} intervals`} />
-        <View
+        <Option
+          name="Focus time"
+          options={OPTIONS['Focus time']}
+          currentValue={focusTime}
+          open={openOption === 'Focus time'}
+          setOpenOption={setOpenOption}
+          actionCreator={changedFocusTime}
+        />
+        <Option
+          name="Short break"
+          options={OPTIONS['Short break']}
+          currentValue={shortBreakTime}
+          open={openOption === 'Short break'}
+          setOpenOption={setOpenOption}
+          actionCreator={changedShortBreakTime}
+        />
+        <Option
+          name="Long break"
+          options={OPTIONS['Long break']}
+          currentValue={longBreakTime}
+          open={openOption === 'Long break'}
+          setOpenOption={setOpenOption}
+          actionCreator={changedLongBreakTime}
+        />
+        <Option
+          name="Sections"
+          options={OPTIONS['Rounds']}
+          currentValue={totalRounds}
+          label="intervals"
+          open={openOption === 'Sections'}
+          setOpenOption={setOpenOption}
+          actionCreator={changedTotalRounds}
+        />
+        <Pressable
+          onPress={() => {
+            dispatch(changedFocusTime(DEFAULT['Focus time']));
+            dispatch(changedShortBreakTime(DEFAULT['Short break']));
+            dispatch(changedLongBreakTime(DEFAULT['Long break']));
+            dispatch(changedTotalRounds(DEFAULT['Rounds']));
+          }}
           style={tw`flex-row absolute bottom-10 rounded-full self-center bg-red-3 py-3 px-10`}
         >
           <Text
@@ -81,10 +122,10 @@ const Timer = ({ navigation }: Props) => {
             color="white"
             style={tw`pl-1 self-center`}
           />
-        </View>
+        </Pressable>
       </View>
     </BaseLayout>
   );
 };
 
-export default Timer;
+export default Settings;
