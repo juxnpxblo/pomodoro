@@ -31,6 +31,7 @@ import {
   gotSettingsChange,
 } from '../settings/settings.slice';
 import { StoredSettings } from '../settings/settings.interface';
+import { Audio } from 'expo-av';
 import { useFonts } from 'expo-font';
 import {
   Lato_400Regular,
@@ -59,6 +60,32 @@ const Timer = ({ navigation }: TimerScreenProps) => {
   const [remainingSeconds, setRemainingSeconds] = useState(0);
 
   const tickingId = useRef<ReturnType<typeof setInterval> | null>(null);
+  const bellRef = useRef(new Audio.Sound());
+
+  async function ringBell() {
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+    });
+
+    const { sound: bell } = await Audio.Sound.createAsync(
+      require('../../assets/audio/bell.mp3')
+    );
+
+    bellRef.current = bell;
+
+    const bellStatus = await bellRef.current.getStatusAsync();
+
+    if (bellStatus.isLoaded) await bellRef.current.playAsync();
+    else console.error('error loading mp3');
+  }
+
+  useEffect(() => {
+    return bellRef
+      ? () => {
+          bellRef.current.unloadAsync();
+        }
+      : undefined;
+  }, [bellRef]);
 
   useEffect(() => {
     restoreSettings();
@@ -123,6 +150,7 @@ const Timer = ({ navigation }: TimerScreenProps) => {
       remainingSeconds === 0 &&
       status === 'TICKING'
     ) {
+      if (ring) ringBell();
       clearInterval(tickingId.current!);
       dispatch(wentToNextSection({ totalRounds: totalRounds.value }));
     }
@@ -252,9 +280,7 @@ const Timer = ({ navigation }: TimerScreenProps) => {
                 </View>
                 <Pressable
                   style={tw`absolute right-0 top-0`}
-                  onPressIn={() => {
-                    dispatch(switchedRinging());
-                  }}
+                  onPressIn={() => dispatch(switchedRinging())}
                 >
                   <Icon
                     name={ring ? 'volume-up' : 'volume-off'}
