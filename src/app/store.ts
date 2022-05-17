@@ -1,6 +1,6 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import timerReducer from '../features/timer/timerSlice';
-import settingsReducer from '../features/settings/settingsSlice';
+import timerReducer from '../features/timer/timer.slice';
+import settingsReducer from '../features/settings/settings.slice';
 
 export const store = configureStore({
   reducer: {

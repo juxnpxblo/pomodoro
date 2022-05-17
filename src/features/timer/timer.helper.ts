@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export const timeToString = (time: number) =>
   time < 10 ? '0' + time : `${time}`;
 
@@ -16,7 +18,10 @@ export const getRemainingTime = (timestamp: number) => {
   const seconds = getRemainingSeconds(totalSecs, minutes);
 
   return {
-    minutes: timeToString(minutes),
-    seconds: timeToString(seconds),
+    minutes,
+    seconds,
   };
 };
+
+export const restore = async (key: string) =>
+  (await AsyncStorage.getItem(key))!;
