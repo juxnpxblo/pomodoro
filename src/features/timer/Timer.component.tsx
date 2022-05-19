@@ -136,25 +136,19 @@ const Timer = ({ navigation }: TimerScreenProps) => {
   useEffect(() => {
     if (status === 'TICKING') {
       tickingId.current = setInterval(async () => {
-        const { minutes, seconds } = h.getRemainingTime(timestamp);
+        const { minutes: min, seconds: sec } = h.getRemainingTime(timestamp);
 
-        setRemainingMinutes(minutes);
-        setRemainingSeconds(seconds);
+        if (min <= 0 && sec <= 0) {
+          if (ring && min === 0 && sec === 0) ringBell();
+          clearInterval(tickingId.current!);
+          dispatch(wentToNextSection({ totalRounds: totalRounds.value }));
+        } else {
+          setRemainingMinutes(min);
+          setRemainingSeconds(sec);
+        }
       }, 1000);
     }
   }, [status]);
-
-  useEffect(() => {
-    if (
-      remainingMinutes === 0 &&
-      remainingSeconds === 0 &&
-      status === 'TICKING'
-    ) {
-      if (ring) ringBell();
-      clearInterval(tickingId.current!);
-      dispatch(wentToNextSection({ totalRounds: totalRounds.value }));
-    }
-  }, [remainingSeconds]);
 
   useEffect(() => {
     if (section.changed) {
